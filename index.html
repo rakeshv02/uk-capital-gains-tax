@@ -1,42 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annuity Calculator – Payment, Present Value & Future Value | Tabutility</title>
+  <meta name="description" content="Free annuity calculator. Calculate annuity payments, present value, future value and payout schedules for ordinary annuities and annuities due." />
+  <meta name="keywords" content="annuity calculator, annuity payment, present value annuity, future value annuity, pension annuity, retirement income" />
+  <link rel="canonical" href="https://annuity-calculator.tabutility.com/" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-78VZWJ5B1W"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-78VZWJ5B1W');</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7039091592734005" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#faf5ff;}.site-nav{background:#1a1a2e;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;}.site-nav a{color:#a5b4fc;text-decoration:none;font-size:14px;font-family:'Segoe UI',Arial,sans-serif;}.nav-brand{color:#fff;font-weight:700;font-size:16px;font-family:'Segoe UI',Arial,sans-serif;}#ad-top,#ad-bottom{text-align:center;padding:10px;background:#fff;}</style>
+</head>
+<body>
+  <nav class="site-nav"><span class="nav-brand">⚡ Tabutility</span><a href="https://tabutility.com">← All Tools</a></nav>
+  <div id="ad-top"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7039091592734005" data-ad-slot="auto" data-ad-format="horizontal" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>
+  <div id="root"></div>
+  <div id="ad-bottom"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7039091592734005" data-ad-slot="auto" data-ad-format="rectangle" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>
+  <script type="text/babel">
+    //<![CDATA[
+    const { useState } = React;
 
-    <!-- ✏️ UPDATE THESE FOR EVERY NEW TOOL -->
-    <title>TOOL NAME — TOOL TAGLINE | Tabutility</title>
-    <meta name="description" content="TOOL DESCRIPTION. No sign-up, runs in your browser." />
-    <meta name="keywords" content="KEYWORD 1, KEYWORD 2, KEYWORD 3, free TOOL NAME" />
-    <link rel="canonical" href="https://SUBDOMAIN.tabutility.com/" />
-    <meta property="og:url" content="https://SUBDOMAIN.tabutility.com/" />
-    <meta property="og:title" content="TOOL NAME — TOOL TAGLINE" />
-    <meta property="og:description" content="TOOL DESCRIPTION. Free, no sign-up." />
-    <meta name="twitter:title" content="TOOL NAME — TOOL TAGLINE" />
-    <meta name="twitter:description" content="TOOL DESCRIPTION. Free, no sign-up." />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>EMOJI</text></svg>" />
-    <!-- ✏️ END OF SECTION TO UPDATE -->
+    const fmtDec = (n, sym) => sym + Math.abs(n).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmt = (n, sym) => sym + Math.round(Math.abs(n)).toLocaleString();
+    const freqLabel = { "12": "Monthly", "4": "Quarterly", "2": "Semi-annual", "1": "Annual" };
 
-    <!-- DO NOT CHANGE ANYTHING BELOW THIS LINE -->
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Tabutility" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="robots" content="index, follow" />
+    function AnnuityCalculator() {
+      const [currency, setCurrency] = useState("gbp");
+      const [mode, setMode] = useState("payment");
+      const [principal, setPrincipal] = useState("100000");
+      const [payment, setPayment] = useState("500");
+      const [rate, setRate] = useState("5");
+      const [years, setYears] = useState("20");
+      const [frequency, setFrequency] = useState("12");
+      const [type, setType] = useState("ordinary");
+      const [result, setResult] = useState(null);
 
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7039091592734005" crossorigin="anonymous"></script>
+      const sym = currency === "gbp" ? "£" : "$";
 
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-78VZWJ5B1W"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-78VZWJ5B1W');
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+      const calculate = () => {
+        const pv = parseFloat(principal) || 0;
+        const pmt = parseFloat(payment) || 0;
+        const annualRate = parseFloat(rate) || 0;
+        const n = parseFloat(years) || 0;
+        const freq = parseFloat(frequency) || 12;
+        const r = annualRate / 100 / freq;
+        const periods = n * freq;
+        const dueMultiplier = type === "due" ? (1 + r) : 1;
+        let calcPayment, calcPV, calcFV, totalPaid, totalInterest;
+        if (r === 0) {
+          calcPayment = pv / periods;
+          calcPV = pmt * periods;
+          calcFV = pv;
+        } else {
+          calcPayment = pv * r / (1 - Math.pow(1 + r, -periods)) / dueMultiplier;
+          calcPV = pmt * (1 - Math.pow(1 + r, -periods)) / r * dueMultiplier;
+          calcFV = pv * Math.pow(1 + r, periods);
+        }
+        if (mode === "payment") {
+          totalPaid = calcPayment * periods;
+          totalInterest = totalPaid - pv;
+          setResult({ mode, calcPayment, pv, totalPaid, totalInterest, freqLbl: freqLabel[frequency] || "Monthly" });
+        } else if (mode === "pv") {
+          totalPaid = pmt * periods;
+          totalInterest = totalPaid - calcPV;
+          setResult({ mode, calcPV, pmt, totalPaid, totalInterest, freqLbl: freqLabel[frequency] || "Monthly" });
+        } else {
+          setResult({ mode, calcFV, pv, totalDeposited: pv, interest: calcFV - pv });
+        }
+      };
+
+      const inputStyle = { width: "100%", padding: "12px", border: "2px solid #e9d5ff", borderRadius: 10, fontSize: 16, boxSizing: "border-box", outline: "none" };
+      const labelStyle = { display: "block", fontWeight: 600, marginBottom: 6, color: "#333" };
+
+      return (
+        <div style={{ fontFamily: "'Segoe UI',Arial,sans-serif", background: "#faf5ff", minHeight: "100vh", padding: "20px" }}>
+          <div style={{ maxWidth: 820, margin: "0 auto" }}>
+            <div style={{ textAlign: "center", marginBottom: 32 }}>
+              <div style={{ fontSize: 48, marginBottom: 8 }}>📋</div>
+              <h1 style={{ margin: 0, fontSize: 32, fontWeight: 800, color: "#1a1a2e" }}>Annuity Calculator</h1>
+              <p style={{ margin: "8px 0 0", color: "#555", fontSize: 16 }}>Calculate annuity payments, present value, future value and payout schedules</p>
+            </div>
+            <div style={{ background: "#fff", borderRadius: 16, padding: 28, boxShadow: "0 4px 24px rgba(0,0,0,0.08)", marginBottom: 24 }}>
+              <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+                {[["gbp","£ GBP"],["usd","$ USD"]].map(([v,l]) => (
+                  <button key={v} onClick={() => setCurrency(v)} style={{ marginRight: 6, padding: "8px 16px", borderRadius: 8, border: `2px solid ${currency===v?"#7c3aed":"#e9d5ff"}`, background: currency===v?"#7c3aed":"#fff", color: currency===v?"#fff":"#333", fontWeight: 600, cursor: "pointer" }}>{l}</button>
+                ))}
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={labelStyle}>Calculate</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {[["payment","Payment Amount"],["pv","Present Value"],["fv","Future Value"]].map(([v,l]) => (
+                    <button key={v} onClick={() => setMode(v)} style={{ padding: "10px 18px", borderRadius: 10, border: `2px solid ${mode===v?"#7c3aed":"#e9d5ff"}`, background: mode===v?"#7c3aed":"#fff", color: mode===v?"#fff":"#333", fontWeight: 600, cursor: "pointer", fontSize: 14 }}>{l}</button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr))", gap: 20 }}>
+                {mode !== "pv" && (
+                  <div>
+                    <label style={labelStyle}>{mode === "fv" ? `Lump Sum (${sym})` : `Loan / Pot Amount (${sym})`}</label>
+                    <div style={{ position: "relative" }}>
+                      <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#666", fontWeight: 600 }}>{sym}</span>
+                      <input type="number" value={principal} onChange={e => setPrincipal(e.target.value)} style={{ ...inputStyle, paddingLeft: 28 }} />
+                    </div>
+                  </div>
+                )}
+                {mode === "pv" && (
+                  <div>
+                    <label style={labelStyle}>Regular Payment ({sym})</label>
+                    <div style={{ position: "relative" }}>
+                      <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#666", fontWeight: 600 }}>{sym}</span>
+                      <input type="number" value={payment} onChange={e => setPayment(e.target.value)} style={{ ...inputStyle, paddingLeft: 28 }} />
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <label style={labelStyle}>Annual Interest Rate (%)</label>
+                  <div style={{ position: "relative" }}>
+                    <input type="number" value={rate} onChange={e => setRate(e.target.value)} style={{ ...inputStyle, paddingRight: 32 }} />
+                    <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "#666" }}>%</span>
+                  </div>
+                </div>
+                <div>
+                  <label style={labelStyle}>Term (Years)</label>
+                  <div style={{ position: "relative" }}>
+                    <input type="number" value={years} onChange={e => setYears(e.target.value)} style={{ ...inputStyle, paddingRight: 40 }} />
+                    <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "#666" }}>yrs</span>
+                  </div>
+                </div>
+                <div>
+                  <label style={labelStyle}>Payment Frequency</label>
+                  <select value={frequency} onChange={e => setFrequency(e.target.value)} style={inputStyle}>
+                    <option value="12">Monthly</option><option value="4">Quarterly</option><option value="2">Semi-annual</option><option value="1">Annual</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Annuity Type</label>
+                  <select value={type} onChange={e => setType(e.target.value)} style={inputStyle}>
+                    <option value="ordinary">Ordinary (end of period)</option><option value="due">Annuity Due (start of period)</option>
+                  </select>
+                </div>
+              </div>
+              <button onClick={calculate} style={{ width: "100%", marginTop: 24, padding: "16px", background: "linear-gradient(135deg, #7c3aed, #6d28d9)", color: "#fff", border: "none", borderRadius: 12, fontSize: 18, fontWeight: 700, cursor: "pointer" }}>Calculate Annuity</button>
+            </div>
+            {result && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px,1fr))", gap: 16, marginBottom: 24 }}>
+                {result.mode === "payment" && [
+                  { label: `${result.freqLbl} Payment`, value: fmtDec(result.calcPayment, sym), color: "#7c3aed", bg: "#faf5ff" },
+                  { label: "Total Paid", value: fmt(result.totalPaid, sym), color: "#e03131", bg: "#fff5f5" },
+                  { label: "Total Interest", value: fmt(result.totalInterest, sym), color: "#e67700", bg: "#fff9db" },
+                ].map((item,i) => (
+                  <div key={i} style={{ background: item.bg, borderRadius: 14, padding: 18, textAlign: "center", border: `2px solid ${item.color}22` }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: item.color }}>{item.value}</div>
+                    <div style={{ fontSize: 12, color: "#555", marginTop: 4, fontWeight: 500 }}>{item.label}</div>
+                  </div>
+                ))}
+                {result.mode === "pv" && [
+                  { label: "Present Value (Lump Sum)", value: fmt(result.calcPV, sym), color: "#7c3aed", bg: "#faf5ff" },
+                  { label: "Total Payments", value: fmt(result.totalPaid, sym), color: "#e03131", bg: "#fff5f5" },
+                  { label: "Total Interest", value: fmt(result.totalInterest, sym), color: "#e67700", bg: "#fff9db" },
+                ].map((item,i) => (
+                  <div key={i} style={{ background: item.bg, borderRadius: 14, padding: 18, textAlign: "center", border: `2px solid ${item.color}22` }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: item.color }}>{item.value}</div>
+                    <div style={{ fontSize: 12, color: "#555", marginTop: 4, fontWeight: 500 }}>{item.label}</div>
+                  </div>
+                ))}
+                {result.mode === "fv" && [
+                  { label: "Future Value", value: fmt(result.calcFV, sym), color: "#2f9e44", bg: "#ebfbee" },
+                  { label: "Interest Earned", value: fmt(result.interest, sym), color: "#7c3aed", bg: "#faf5ff" },
+                  { label: "Initial Deposit", value: fmt(result.totalDeposited, sym), color: "#0369a1", bg: "#e0f2fe" },
+                ].map((item,i) => (
+                  <div key={i} style={{ background: item.bg, borderRadius: 14, padding: 18, textAlign: "center", border: `2px solid ${item.color}22` }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: item.color }}>{item.value}</div>
+                    <div style={{ fontSize: 12, color: "#555", marginTop: 4, fontWeight: 500 }}>{item.label}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {result && <div style={{ background: "#fff3cd", border: "1px solid #ffc107", borderRadius: 12, padding: 16, fontSize: 13, color: "#664d03" }}><strong>Estimate only.</strong> Does not account for tax, inflation, fees or variable rates. For pension annuity quotes contact a regulated financial adviser or compare via Pension Wise (gov.uk).</div>}
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<AnnuityCalculator />);
+    //]]>
+  </script>
+</body>
 </html>
